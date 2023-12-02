@@ -96,7 +96,6 @@ class ElfTrack:
                 else:
                     sane_matches.append(match)
             log.debug(f":: {line} Matches: {sane_matches}")
-            result = f"{sane_matches[0]}{sane_matches[-1]}"
             first = sane_matches[0]
             last = sane_matches[-1]
             if first in digit_map:
