@@ -17,26 +17,33 @@ prog_description = "Does something"
 # Set up Logging to stderr/stdout
 log = logging.getLogger()
 
-class IsCorrect(Exception): pass
-class NotCorrect(Exception): pass
 
+class IsCorrect(Exception):
+    pass
+
+
+class NotCorrect(Exception):
+    pass
+
+
+# Lookup table for converting number words to digits
 digit_map = {
-    'one': 1,
-    'two': 2,
-    'three': 3,
-    'four': 4,
-    'five': 5,
-    'six': 6,
-    'seven': 7,
-    'eight': 8,
-    'nine': 9,
-    'twone': 1
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
 }
+
 
 class ElfTrack:
     # We use this function when the thing we want to process is only one line at a time.
     # For cases where the data spans multiple lines, we don't do this, we use a generator further down.
-    def parse_input(self):    
+    def parse_input(self):
         line_counter = 0
         data = []
         with open(self.args.my_file) as input:
@@ -49,23 +56,26 @@ class ElfTrack:
                     data.append(line)
         return data
 
-    def parse_data_method_one(self,data):
+    # Simple find the numbers, get first and last
+    def parse_data_method_one(self, data):
         rex = "(\d)"
         total = 0
         for line in data:
-            matches = re.findall(rex,line)
+            matches = re.findall(rex, line)
             log.debug(f"Matches: {matches}")
             result = f"{matches[0]}{matches[-1]}"
             log.debug(f"result {result}")
-            results=int(result)
+            results = int(result)
             total += results
         log.info(total)
 
-    def parse_data_method_two(self,data):
+    # Now we have to find number strings as well.
+    # After getting the data and failing a few times, discovered that some words were portmanteaud together, so we handle them ad-hoc
+    def parse_data_method_two(self, data):
         rex = "(nineight|threeight|eightwo|oneight|twone|one|two|three|four|five|six|seven|eight|nine|\d)"
         total = 0
         for line in data:
-            matches = re.findall(rex,line)
+            matches = re.findall(rex, line)
             sane_matches = []
             for match in matches:
                 if match == "twone":
@@ -97,16 +107,16 @@ class ElfTrack:
                 last_digit = str(digit_map[last])
             else:
                 last_digit = str(last)
-            result = int("".join([first_digit,last_digit]))
+            result = int("".join([first_digit, last_digit]))
             log.debug(f"result {result}")
             total += result
             log.debug(result)
         log.info(total)
-             
+
     def __init__(self, args):
         # Take the command line args and store them as an instance variable for quick access.
         self.args = args
-        
+
 
 # Let's Get our command line parameters
 def get_parameters():
@@ -126,8 +136,9 @@ def get_parameters():
         help="File to load",
         required=True,
     )
- 
+
     return parser.parse_args()
+
 
 def main():
     cli_args = get_parameters()
@@ -149,6 +160,7 @@ def main():
 
     elf_tracker.parse_data_method_one(data)
     elf_tracker.parse_data_method_two(data)
-    
+
+
 if __name__ == "__main__":
     main()
